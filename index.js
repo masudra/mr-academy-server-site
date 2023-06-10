@@ -25,11 +25,19 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     const  classCollection = client.db('mrAcademy').collection('classes');
+    const  studentSelectCollection = client.db('mrAcademy').collection('studentSelect');
 
 
     app.get('/classes',async(req,res)=>{
         const result = await  classCollection.find().toArray()
         res.send(result)
+    })
+
+    app.post('/studentSelect',async(req,res)=>{
+      const item = req.body;
+      console.log(item);
+      const result = await studentSelectCollection.insertOne(item)
+      res.send(result)
     })
 
 
