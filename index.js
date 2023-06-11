@@ -26,8 +26,18 @@ async function run() {
     await client.connect();
     const classCollection = client.db('mrAcademy').collection('classes');
     const studentSelectCollection = client.db('mrAcademy').collection('studentSelect');
+    const userCollection = client.db('mrAcademy').collection('user');
+
+    // user Releted Apis
+
+    app.post('/users', async (req, res) => {
+      const  user =req.body;
+      const result  = await userCollection.insertOne(user)
+      res.send(result)
+    })
 
 
+    //  classes Apis
     app.get('/classes', async (req, res) => {
       const result = await classCollection.find().toArray()
       res.send(result)
@@ -35,13 +45,13 @@ async function run() {
 
     // get student seleted  all data 
 
-    app.get('/studentSelect',async(req,res)=>{
+    app.get('/studentSelect', async (req, res) => {
       const result = await studentSelectCollection.find().toArray()
       const email = req.query.email;
-      if(!email){
+      if (!email) {
         res.send([])
       }
-      const query = {email:email}
+      const query = { email: email }
       res.send(result)
     })
 
@@ -54,13 +64,13 @@ async function run() {
     })
 
     // Dellet one Student seleted data
-    app.delete('/studentSelect/:id',async(req,res)=>{
-      const  id = req.params.id;
-      const query = {_id: new ObjectId(id)}
+    app.delete('/studentSelect/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
       const result = await studentSelectCollection.deleteOne(query)
       res.send(result)
     })
-   
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
