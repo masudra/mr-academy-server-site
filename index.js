@@ -3,7 +3,7 @@ const cors = require('cors')
 const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config()
 const app = express()
-const port = process.env.PORT ||5000;
+const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
@@ -24,22 +24,37 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    const  classCollection = client.db('mrAcademy').collection('classes');
-    const  studentSelectCollection = client.db('mrAcademy').collection('studentSelect');
+    const classCollection = client.db('mrAcademy').collection('classes');
+    const studentSelectCollection = client.db('mrAcademy').collection('studentSelect');
 
 
-    app.get('/classes',async(req,res)=>{
-        const result = await  classCollection.find().toArray()
-        res.send(result)
+    app.get('/classes', async (req, res) => {
+      const result = await classCollection.find().toArray()
+      res.send(result)
     })
 
-    app.post('/studentSelect',async(req,res)=>{
+    // 
+
+    app.get('/studentSelect',async(req,res)=>{
+      const result = await studentSelectCollection.find().toArray()
+      const email = req.query.email;
+      if(!email){
+        res.send([])
+      }
+      const query = {email:email}
+      res.send(result)
+    })
+
+
+    // 
+    app.post('/studentSelect', async (req, res) => {
       const item = req.body;
-      console.log(item);
       const result = await studentSelectCollection.insertOne(item)
       res.send(result)
     })
 
+    // 
+   
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
@@ -55,11 +70,11 @@ run().catch(console.dir);
 
 
 
-app.get('/',(req,res)=>{
-    res.send('Hellow World')
+app.get('/', (req, res) => {
+  res.send('Hellow World')
 })
 
-app.listen(port,()=>{
-    console.log(`port is running on ${port}`);
+app.listen(port, () => {
+  console.log(`port is running on ${port}`);
 })
 
