@@ -29,17 +29,37 @@ async function run() {
     const userCollection = client.db('mrAcademy').collection('user');
 
     // user Releted Apis
-
-    app.post('/users', async (req, res) => {
-      const  user =req.body;
-      const query = {email: user?.email}
-      const existingUser = await userCollection.findOne(query)
-      if(existingUser){
-        return res.send({message: 'User Already Exist'})
-      }
-      const result  = await userCollection.insertOne(user)
+    // get all users
+    app.get('/users', async (req, res) => {
+      const result = await userCollection.find().toArray()
       res.send(result)
     })
+    // Creat Users One 
+    app.post('/users', async (req, res) => {
+      const user = req.body;
+      const query = { email: user?.email }
+      const existingUser = await userCollection.findOne(query)
+      if (existingUser) {
+        return res.send({ message: 'User Already Exist' })
+      }
+      const result = await userCollection.insertOne(user)
+      res.send(result)
+    })
+
+    // 
+
+    app.patch('/users/admin/:id',async(req ,res)=>{
+      const id =req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const updateDoc= {
+        $set:{
+          role: 'admin'
+        },
+      }
+      const result = await userCollection.updateOne(filter,updateDoc)
+      res.send(result)
+    })
+    
 
 
     //  classes Apis
@@ -48,8 +68,8 @@ async function run() {
       res.send(result)
     })
 
+    // Student Seleted  Releted Apis
     // get student seleted  all data 
-
     app.get('/studentSelect', async (req, res) => {
       const result = await studentSelectCollection.find().toArray()
       const email = req.query.email;
