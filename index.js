@@ -57,8 +57,20 @@ async function run() {
     const verifyAdmin = async(req,res,next)=>{
       const email = req.decoded.email;
       const query = {email: email};
-      const result = await userCollection.findOne(query);
+      const user = await userCollection.findOne(query);
       if(user?.role !== 'admin'){
+        return res.status(403).send({error: true, message: 'forbidden message '});
+      }
+      next();
+    }
+
+
+    // varyfi instructor
+    const verifyInstructor = async(req,res,next)=>{
+      const email = req.decoded.email;
+      const query = {email: email};
+      const result = await userCollection.findOne(query);
+      if(user?.role !== 'instructor'){
         return res.status(403).send({error: true, message: 'forbidden message '});
       }
       next();
@@ -70,6 +82,14 @@ async function run() {
       const result = await userCollection.find().toArray()
       res.send(result)
     })
+
+    // verifyInstructor
+    app.get('/users', verifyJWT,verifyInstructor, async (req, res) => {
+      const result = await userCollection.find().toArray()
+      res.send(result)
+    })
+
+
     // Creat Users One 
     app.post('/users', async (req, res) => {
       const user = req.body;
@@ -115,7 +135,17 @@ async function run() {
 
     // Make Instructor 
 
-    
+    app.get('/users/instructor/:email', verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      if (req.decoded.email !== email) {
+        res.send({ instructor: false })
+      }
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      const result = { instructor: user?.role === 'instructor' };
+      res.send(result);
+
+    })
 
 
     app.patch('/users/instructor/:id', async (req, res) => {
