@@ -168,6 +168,11 @@ async function run() {
       const result = await classCollection.find().toArray()
       res.send(result)
     })
+    app.post('/classes', async (req, res) => {
+      const item = req.body;
+      const result = await classCollection.insertOne(item)
+      res.send(result)
+    })
 
     // Student Seleted  Releted Apis
     // get student seleted  all data 
